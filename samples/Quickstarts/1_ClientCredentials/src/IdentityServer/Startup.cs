@@ -3,6 +3,7 @@
 
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityServer
@@ -27,7 +28,7 @@ namespace IdentityServer
 
             // uncomment if you want to add MVC
             //app.UseStaticFiles();
-            //app.UseRouting();
+            app.UseRouting();
 
             app.UseIdentityServer();
 
@@ -37,6 +38,14 @@ namespace IdentityServer
             //{
             //    endpoints.MapDefaultControllerRoute();
             //});
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Hello, EntityServer 4 is running");
+                });
+            });
         }
     }
 }
