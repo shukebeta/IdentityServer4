@@ -14,23 +14,33 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
+using Microsoft.Extensions.Configuration;
+
 namespace IdentityServer
 {
     public class Startup
     {
+        private IConfiguration Configuration;
+
+        public Startup(IConfiguration config)
+        {
+            Configuration = config;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
             // migration assembly required as DbContext's are in a different assembly
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            const string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;database=IdentityServer4.Quickstart.EntityFramework-3.0.0;trusted_connection=yes;";
+            //const string connectionString = @"Data Source=127.0.0.1,1433;database=IdentityServer4.Quickstart.EntityFramework-3.0.0;trusted_connection=yes;";
+            const string connectionString = @"Server=127.0.0.1,1433; Database=IdentityServer4.Quickstart.EntityFramework-3.0.0;User Id=sa; Password=WeChange20070517;Trusted_Connection=false";
 
             var builder = services.AddIdentityServer()
                 .AddTestUsers(TestUsers.Users)
                 .AddConfigurationStore(options =>
                 {
-                    options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
+                    options.ConfigureDbContext = b => b.UseSqlServer(/*Configuration.GetConnectionString("DevDatabase")*/connectionString,
                         sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
@@ -72,7 +82,7 @@ namespace IdentityServer
         {
             if (env.IsDevelopment())
             {
-                InitializeDatabase(app);
+                //InitializeDatabase(app);
                 app.UseDeveloperExceptionPage();
             }
 
